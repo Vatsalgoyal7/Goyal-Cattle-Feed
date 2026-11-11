@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Eye comfort theme tokens */
+html.theme-comfort {
+  background-color: #f7f3e8;
+  color: #383024;
+}
+
+html.theme-comfort .comfort-bg-canvas {
+  background-color: #f7f3e8;
+}
+
+html.theme-comfort .comfort-bg-surface {
+  background-color: #fffdf7;
+}
+
+html.theme-comfort .comfort-bg-muted {
+  background-color: #eee7d3;
+}
+
+html.theme-comfort .comfort-border {
+  border-color: #dfd4b8;
+}
+
+html.theme-comfort .comfort-text-main {
+  color: #383024;
+}
+
+html.theme-comfort .comfort-text-muted {
+  color: #796c56;
+}
+
+/* Tabular figures for all numeric figures */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Scrollbar polish */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+/* Print stylesheets for authentic invoices & statements */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  aside,
+  header,
+  nav,
+  .no-print,
+  button,
+  [role="dialog"] > div > div:first-child {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .print\:p-0 {
+    padding: 0 !important;
+  }
+
+  .print\:border-none {
+    border: none !important;
+  }
+
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+}

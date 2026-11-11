@@ -1,0 +1,8 @@
+{
+  "name": "Goyal Business OS",
+  "description": "Enterprise Business OS and ERP platform for Goyal Cattle Feed Pvt. Ltd. with comprehensive sales, purchase, inventory, accounts, and factory operations control.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
