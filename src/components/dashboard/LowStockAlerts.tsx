@@ -23,7 +23,7 @@ export const LowStockAlerts: React.FC = () => {
         </div>
 
         <NavLink
-          to="/stock"
+          to="/app/stock"
           className="text-xs text-emerald-700 dark:text-emerald-400 hover:underline font-semibold"
         >
           {t.viewAll}

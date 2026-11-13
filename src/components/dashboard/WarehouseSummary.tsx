@@ -20,7 +20,7 @@ export const WarehouseSummary: React.FC = () => {
         </div>
 
         <NavLink
-          to="/warehouses"
+          to="/app/warehouses"
           className="text-xs text-emerald-700 dark:text-emerald-400 hover:underline font-semibold"
         >
           {t.viewAll}
@@ -66,7 +66,7 @@ export const WarehouseSummary: React.FC = () => {
               <div className="flex justify-between text-slate-600 dark:text-slate-400">
                 <span>Stock Valuation:</span>
                 <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">
-                  {formatIndianCurrency(wh.totalStockValue)}
+                  {formatIndianCurrency(wh.totalStockValue || 0)}
                 </span>
               </div>
 

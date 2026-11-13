@@ -32,6 +32,7 @@ import {
   SAMPLE_ACTIVITIES,
 } from '../data/sampleData';
 import { translations, TranslationDictionary } from '../i18n/translations';
+import { useAuth } from './AuthContext';
 
 interface AppContextType {
   // Roles & User
@@ -88,8 +89,11 @@ interface AppContextType {
   warehouses: WarehouseSummaryItem[];
   activities: ActivityLogItem[];
 
-  // Mutations (demo)
+  // Mutations
   addTransaction: (item: Omit<TransactionItem, 'id'>) => void;
+  addProduct: (item: Omit<ProductItem, 'id'>) => void;
+  addCustomer: (item: Omit<CustomerItem, 'id'>) => void;
+  resetToStoreDefaults: () => void;
   addActivity: (action: string, details: string, category: ActivityLogItem['category']) => void;
 
   // I18n helper
@@ -134,16 +138,88 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
   const [activeQuickAction, setActiveQuickAction] = useState<QuickActionType | null>(null);
 
-  // Entities state
-  const [userProfile, setUserProfile] = useState<UserProfile>(INITIAL_USER_PROFILE);
-  const [companyProfile, setCompanyProfile] = useState<CompanyProfile>(INITIAL_COMPANY_PROFILE);
+  // Auth integration
+  const { appUser } = useAuth();
+
+  // Entities state with persistence
+  const [userProfile, setUserProfile] = useState<UserProfile>(() => {
+    const saved = localStorage.getItem('goyal_user_profile');
+    return saved ? JSON.parse(saved) : INITIAL_USER_PROFILE;
+  });
+
+  const [companyProfile, setCompanyProfile] = useState<CompanyProfile>(() => {
+    const saved = localStorage.getItem('goyal_company_profile');
+    return saved ? JSON.parse(saved) : INITIAL_COMPANY_PROFILE;
+  });
+
   const [notifications, setNotifications] = useState<NotificationItem[]>(SAMPLE_NOTIFICATIONS);
-  const [products] = useState<ProductItem[]>(SAMPLE_PRODUCTS);
-  const [customers] = useState<CustomerItem[]>(SAMPLE_CUSTOMERS);
-  const [transactions, setTransactions] = useState<TransactionItem[]>(SAMPLE_TRANSACTIONS);
-  const [pendingPayments] = useState<PendingPaymentItem[]>(SAMPLE_PENDING_PAYMENTS);
-  const [warehouses] = useState<WarehouseSummaryItem[]>(SAMPLE_WAREHOUSES);
+
+  const [products, setProducts] = useState<ProductItem[]>(() => {
+    const saved = localStorage.getItem('goyal_products');
+    return saved ? JSON.parse(saved) : SAMPLE_PRODUCTS;
+  });
+
+  const [customers, setCustomers] = useState<CustomerItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('goyal_app_customers') || localStorage.getItem('goyal_customers');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((c: any) => ({
+            id: c.id || `cst-${Math.random()}`,
+            name: c.name || 'Local Customer',
+            firmName: c.firmName || c.name || 'Retail Dairy Customer',
+            city: c.city || 'Gajraula',
+            state: c.state || 'Uttar Pradesh',
+            phone: c.phone || '+91 98370 49021',
+            creditLimit: Number(c.creditLimit) || 100000,
+            totalPurchases: Number(c.totalPurchases ?? c.totalSales ?? 0),
+            outstandingAmount: Number(c.outstandingAmount ?? c.currentOutstanding ?? 0),
+            paymentStatus: c.paymentStatus || 'Good',
+            lastPurchaseDate: c.lastPurchaseDate || '12/11/2026',
+          }));
+        }
+      }
+    } catch (e) {
+      console.warn('Customer parse notice:', e);
+    }
+    return SAMPLE_CUSTOMERS;
+  });
+
+  const [transactions, setTransactions] = useState<TransactionItem[]>(() => {
+    const saved = localStorage.getItem('goyal_transactions');
+    return saved ? JSON.parse(saved) : SAMPLE_TRANSACTIONS;
+  });
+
+  const [pendingPayments, setPendingPayments] = useState<PendingPaymentItem[]>(() => {
+    const saved = localStorage.getItem('goyal_pending_payments');
+    return saved ? JSON.parse(saved) : SAMPLE_PENDING_PAYMENTS;
+  });
+
+  const [warehouses, setWarehouses] = useState<WarehouseSummaryItem[]>(SAMPLE_WAREHOUSES);
   const [activities, setActivities] = useState<ActivityLogItem[]>(SAMPLE_ACTIVITIES);
+
+  // Sync with Firebase Auth user whenever login changes
+  useEffect(() => {
+    if (appUser) {
+      setUserProfile(prev => {
+        const updated: UserProfile = {
+          ...prev,
+          fullName: appUser.displayName || prev.fullName || 'Vatsal Goyal',
+          email: appUser.email || prev.email || 'vatsalgoyal71@gmail.com',
+          phone: appUser.phone || prev.phone || '+91 7310698091',
+          role: (appUser.role as UserRole) || prev.role || 'Owner / Super Admin',
+          avatarUrl: appUser.photoURL || prev.avatarUrl || '/images/goyal_shop_real.png',
+        };
+        localStorage.setItem('goyal_user_profile', JSON.stringify(updated));
+        return updated;
+      });
+      if (appUser.role) {
+        setActiveRole(appUser.role as UserRole);
+        localStorage.setItem('goyal_role', appUser.role);
+      }
+    }
+  }, [appUser]);
 
   // Theme application to root HTML element
   useEffect(() => {
@@ -255,7 +331,47 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...item,
       id: `txn-${Date.now()}`,
     };
-    setTransactions(prev => [newTxn, ...prev]);
+    setTransactions(prev => {
+      const updated = [newTxn, ...prev];
+      localStorage.setItem('goyal_transactions', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const addProduct = (item: Omit<ProductItem, 'id'>) => {
+    const newProd: ProductItem = {
+      ...item,
+      id: `prd-${Date.now()}`,
+    };
+    setProducts(prev => {
+      const updated = [newProd, ...prev];
+      localStorage.setItem('goyal_products', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const addCustomer = (item: Omit<CustomerItem, 'id'>) => {
+    const newCust: CustomerItem = {
+      ...item,
+      id: `cst-${Date.now()}`,
+    };
+    setCustomers(prev => {
+      const updated = [newCust, ...prev];
+      localStorage.setItem('goyal_app_customers', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const resetToStoreDefaults = () => {
+    localStorage.removeItem('goyal_products');
+    localStorage.removeItem('goyal_app_customers');
+    localStorage.removeItem('goyal_customers');
+    localStorage.removeItem('goyal_transactions');
+    localStorage.removeItem('goyal_pending_payments');
+    setProducts(SAMPLE_PRODUCTS);
+    setCustomers(SAMPLE_CUSTOMERS);
+    setTransactions(SAMPLE_TRANSACTIONS);
+    setPendingPayments(SAMPLE_PENDING_PAYMENTS);
   };
 
   const addActivity = (action: string, details: string, category: ActivityLogItem['category']) => {
@@ -323,6 +439,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         warehouses,
         activities,
         addTransaction,
+        addProduct,
+        addCustomer,
+        resetToStoreDefaults,
         addActivity,
         t,
       }}

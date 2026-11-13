@@ -20,7 +20,7 @@ export const RecentTransactionsTable: React.FC = () => {
         </div>
 
         <NavLink
-          to="/sales"
+          to="/app/sales"
           className="text-xs text-emerald-700 dark:text-emerald-400 hover:underline font-semibold"
         >
           {t.viewAll}
@@ -88,7 +88,7 @@ export const RecentTransactionsTable: React.FC = () => {
                           : 'text-slate-900 dark:text-white'
                       }
                     >
-                      {formatIndianCurrency(txn.amount)}
+                      {formatIndianCurrency(txn.amount || 0)}
                     </span>
                   </td>
 

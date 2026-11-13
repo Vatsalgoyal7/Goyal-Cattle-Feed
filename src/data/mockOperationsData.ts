@@ -627,7 +627,7 @@ export const INITIAL_STOCK_MOVEMENTS: StockMovement[] = [
     quantityOut: 2.5,
     balance: 180,
     unit: 'Quintal',
-    createdBy: 'Rajesh Goyal (Approved by MD)',
+    createdBy: 'Vatsal Goyal (Approved by MD)',
     notes: 'Quarterly silo calibration physical verification adjustment (moisture evaporation loss 0.4%).',
   },
 ];
@@ -653,7 +653,7 @@ export const INITIAL_TRANSFERS: StockTransfer[] = [
     receivedQty: 0,
     notes: 'Scheduled replenishment for Rohtak dealer orders. E-Way Bill #281920194812.',
     createdBy: 'Manish Kumar',
-    approvedBy: 'Rajesh Goyal',
+    approvedBy: 'Vatsal Goyal',
   },
   {
     id: 'trf-002',
@@ -676,7 +676,7 @@ export const INITIAL_TRANSFERS: StockTransfer[] = [
     damagedQty: 0,
     notes: 'Consignment received in sound condition at Agra warehouse. Unloaded by contract labour.',
     createdBy: 'Manish Kumar',
-    approvedBy: 'Rajesh Goyal',
+    approvedBy: 'Vatsal Goyal',
     receivedBy: 'Rajendra Prasad',
     receivedDate: '09/11/2026',
   },
@@ -954,7 +954,7 @@ export const INITIAL_QUALITY_INSPECTIONS: QualityInspection[] = [
     overallStatus: 'Passed',
     sampleSize: '5 Bags (Composite Core Sample)',
     remarks: 'Complies with BIS Type-II specifications. Certified for immediate dispatch.',
-    approvedBy: 'Rajesh Goyal',
+    approvedBy: 'Vatsal Goyal',
   },
   {
     id: 'qc-002',
@@ -982,7 +982,7 @@ export const INITIAL_QUALITY_INSPECTIONS: QualityInspection[] = [
     referenceId: 'BATCH-26-890',
     productName: 'Goyal Gold Cattle Feed (50kg)',
     date: '11/11/2026',
-    inspector: 'Rajiv Mehra (Lab Analyst)',
+    inspector: 'Dr. V. K. Sharma (Quality Analyst)',
     parameters: [
       { parameter: 'Conditioning Temperature', standard: '80°C - 85°C', actual: '82.5°C', status: 'Passed' },
       { parameter: 'Pellet Diameter', standard: '6.0 mm ± 0.2', actual: '6.05 mm', status: 'Passed' },

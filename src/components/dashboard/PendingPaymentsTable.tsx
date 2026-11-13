@@ -12,7 +12,7 @@ export const PendingPaymentsTable: React.FC = () => {
     setReminderSentId(item.id);
     addActivity(
       'Sent Payment Reminder',
-      `WhatsApp & SMS alert sent to ${item.customerName} for ${formatIndianCurrency(item.dueAmount)}`,
+      `WhatsApp & SMS alert sent to ${item.customerName} for ${formatIndianCurrency(item.dueAmount || 0)}`,
       'Accounts'
     );
     setTimeout(() => {
@@ -33,7 +33,7 @@ export const PendingPaymentsTable: React.FC = () => {
         </div>
 
         <NavLink
-          to="/accounts"
+          to="/app/accounts"
           className="text-xs text-emerald-700 dark:text-emerald-400 hover:underline font-semibold"
         >
           {t.viewAll}
@@ -70,7 +70,7 @@ export const PendingPaymentsTable: React.FC = () => {
                 </td>
 
                 <td className="py-3 px-3 text-right font-mono font-bold text-rose-600 dark:text-rose-400 tabular-nums">
-                  {formatIndianCurrency(p.dueAmount)}
+                  {formatIndianCurrency(p.dueAmount || 0)}
                 </td>
 
                 <td className="py-3 px-3 text-center font-mono text-slate-600 dark:text-slate-400 text-[11px]">

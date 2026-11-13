@@ -7,9 +7,9 @@ import { NavLink } from 'react-router-dom';
 export const TopSellingProducts: React.FC = () => {
   const { products, t } = useApp();
 
-  const finishedProducts = products
-    .filter(p => p.category === 'Finished Feed')
-    .sort((a, b) => b.salesValueToday - a.salesValueToday);
+  const finishedProducts = (products || [])
+    .filter(p => p.category === 'Finished Feed' || (p as any).productType === 'Finished')
+    .sort((a, b) => ((b.salesValueToday || 0) - (a.salesValueToday || 0)));
 
   return (
     <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs">
@@ -24,7 +24,7 @@ export const TopSellingProducts: React.FC = () => {
         </div>
 
         <NavLink
-          to="/stock"
+          to="/app/stock"
           className="text-xs text-emerald-700 dark:text-emerald-400 hover:underline font-semibold"
         >
           {t.viewAll}
@@ -64,16 +64,16 @@ export const TopSellingProducts: React.FC = () => {
                 </td>
 
                 <td className="py-3 px-3 text-right font-mono font-medium text-slate-900 dark:text-white tabular-nums">
-                  {p.bagsSoldToday} Bags
+                  {p.bagsSoldToday || 0} Bags
                 </td>
 
                 <td className="py-3 px-3 text-right font-mono font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">
-                  {formatIndianCurrency(p.salesValueToday)}
+                  {formatIndianCurrency(p.salesValueToday || 0)}
                 </td>
 
                 <td className="py-3 px-3 text-right">
                   <span className="font-mono text-slate-700 dark:text-slate-300 tabular-nums font-medium">
-                    {p.currentStock.toLocaleString()} Bags
+                    {(p.currentStock || 0).toLocaleString()} Bags
                   </span>
                   <div className="text-[10px] text-emerald-600 font-medium">
                     In Buffer

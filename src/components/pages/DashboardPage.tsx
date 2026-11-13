@@ -45,7 +45,12 @@ export const DashboardPage: React.FC = () => {
     return t.greetingEvening;
   };
 
-  const currentDateFormatted = 'Wednesday, 11 Nov 2026';
+  const currentDateFormatted = new Intl.DateTimeFormat('en-IN', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date());
 
   const dateFilters: { id: DateRange; label: string }[] = [
     { id: 'today', label: t.today },
@@ -76,25 +81,32 @@ export const DashboardPage: React.FC = () => {
     <div className="space-y-6">
       {/* Top Banner / Breadcrumb & Controls */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1">
-            <span>{companyProfile.companyName}</span>
-            <span>·</span>
-            <span className="font-semibold text-emerald-800 dark:text-emerald-400">
-              {companyProfile.tagline}
-            </span>
+        <div className="flex items-center gap-3.5">
+          <img
+            src="/images/goyal_shop_real.png"
+            alt="Goyal Cattle Feed Store"
+            className="w-14 h-14 rounded-xl object-cover ring-2 ring-emerald-600/30 shadow-xs hidden sm:block shrink-0"
+          />
+          <div>
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-0.5">
+              <span className="font-semibold text-slate-800 dark:text-slate-200">{companyProfile.companyName}</span>
+              <span>·</span>
+              <span className="text-emerald-800 dark:text-emerald-400 font-medium">
+                {companyProfile.tagline}
+              </span>
+            </div>
+
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+              <span>{getGreeting()}, {userProfile.fullName.split(' ')[0]}</span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                Live Store
+              </span>
+            </h1>
+
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Today is <strong className="text-slate-700 dark:text-slate-300">{currentDateFormatted}</strong> · Gajraula Store & Godowns Active
+            </p>
           </div>
-
-          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <span>{getGreeting()}, {userProfile.fullName.split(' ')[0]}</span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-              Live
-            </span>
-          </h1>
-
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Today is <strong className="text-slate-700 dark:text-slate-300">{currentDateFormatted}</strong> · All manufacturing units operational
-          </p>
         </div>
 
         {/* Filters and Actions */}

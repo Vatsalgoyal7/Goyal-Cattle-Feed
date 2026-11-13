@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { NavLink } from 'react-router-dom';
 import {
   Search,
@@ -22,6 +23,9 @@ import {
   Layers,
   Shield,
   Check,
+  LogOut,
+  Home,
+  CheckCircle2,
 } from 'lucide-react';
 import { UserRole } from '../../types';
 
@@ -48,6 +52,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({ onMobileMenuToggle }) => {
     setActiveRole,
     userProfile,
   } = useApp();
+  const { logout, appUser } = useAuth();
 
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
@@ -344,12 +349,15 @@ export const TopHeader: React.FC<TopHeaderProps> = ({ onMobileMenuToggle }) => {
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
             className="flex items-center gap-2 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
-            <img
-              src={userProfile.avatarUrl}
-              alt={userProfile.fullName}
-              referrerPolicy="no-referrer"
-              className="w-8 h-8 rounded-full object-cover ring-1 ring-emerald-600/30"
-            />
+            <div className="w-8 h-8 rounded-full bg-emerald-800 text-amber-300 flex items-center justify-center font-bold text-xs shadow-xs ring-2 ring-emerald-600/30">
+              {(userProfile.fullName || 'Vatsal Goyal')
+                .split(' ')
+                .filter(Boolean)
+                .map(w => w[0])
+                .join('')
+                .substring(0, 2)
+                .toUpperCase()}
+            </div>
             <div className="hidden sm:block text-left">
               <div className="text-xs font-semibold text-slate-900 dark:text-white leading-tight">
                 {userProfile.fullName}
@@ -364,22 +372,27 @@ export const TopHeader: React.FC<TopHeaderProps> = ({ onMobileMenuToggle }) => {
           {isUserMenuOpen && (
             <div className="absolute right-0 mt-2 w-64 rounded-xl bg-white dark:bg-slate-900 shadow-xl border border-slate-200 dark:border-slate-800 py-2 z-50 text-xs">
               {/* Profile Card Header */}
-              <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800">
                 <div className="font-bold text-slate-900 dark:text-white text-sm">
                   {userProfile.fullName}
                 </div>
-                <div className="text-slate-500 text-[11px]">
+                <div className="text-slate-500 text-[11px] truncate">
                   {userProfile.email}
                 </div>
-                <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                  <Shield className="w-3 h-3" /> {activeRole}
+                <div className="mt-1.5 flex items-center gap-1.5">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+                    <Shield className="w-3 h-3 text-emerald-600" /> {activeRole}
+                  </span>
+                  <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                    <CheckCircle2 className="w-2.5 h-2.5" /> Verified
+                  </span>
                 </div>
               </div>
 
               {/* Navigation links */}
               <div className="py-1">
                 <NavLink
-                  to="/profile"
+                  to="/app/profile"
                   onClick={() => setIsUserMenuOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
@@ -388,7 +401,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({ onMobileMenuToggle }) => {
                 </NavLink>
 
                 <NavLink
-                  to="/company-profile"
+                  to="/app/company-profile"
                   onClick={() => setIsUserMenuOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
@@ -397,39 +410,36 @@ export const TopHeader: React.FC<TopHeaderProps> = ({ onMobileMenuToggle }) => {
                 </NavLink>
 
                 <NavLink
-                  to="/settings"
+                  to="/app/settings"
                   onClick={() => setIsUserMenuOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 >
                   <Settings className="w-4 h-4 text-slate-400" />
                   <span>{t.settings}</span>
                 </NavLink>
+
+                <NavLink
+                  to="/"
+                  onClick={() => setIsUserMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-t border-slate-100 dark:border-slate-800 mt-1 pt-2"
+                >
+                  <Home className="w-4 h-4 text-slate-400" />
+                  <span>Main Website Home</span>
+                </NavLink>
               </div>
 
-              {/* Demo Role Switcher Section */}
-              <div className="border-t border-slate-100 dark:border-slate-800 pt-2 pb-1">
-                <div className="px-4 pb-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                  Switch Active Role (Demo)
-                </div>
-                <div className="max-h-36 overflow-y-auto px-2 space-y-0.5">
-                  {rolesList.map(r => (
-                    <button
-                      key={r}
-                      onClick={() => {
-                        setActiveRole(r);
-                        setIsUserMenuOpen(false);
-                      }}
-                      className={`w-full text-left px-2.5 py-1 rounded text-[11px] transition-colors flex items-center justify-between ${
-                        activeRole === r
-                          ? 'bg-emerald-700 text-white font-semibold'
-                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                      }`}
-                    >
-                      <span className="truncate">{r}</span>
-                      {activeRole === r && <Check className="w-3 h-3 shrink-0 ml-1" />}
-                    </button>
-                  ))}
-                </div>
+              {/* Logout Action */}
+              <div className="border-t border-slate-100 dark:border-slate-800 pt-1.5 px-2">
+                <button
+                  onClick={() => {
+                    setIsUserMenuOpen(false);
+                    logout();
+                  }}
+                  className="w-full text-left px-3 py-2 rounded-lg text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors flex items-center gap-2 font-semibold"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Log Out (लॉग आउट)</span>
+                </button>
               </div>
             </div>
           )}

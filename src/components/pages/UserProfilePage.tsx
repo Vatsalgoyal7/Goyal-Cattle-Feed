@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import {
   User,
   Shield,
@@ -18,6 +19,7 @@ import { UserRole } from '../../types';
 
 export const UserProfilePage: React.FC = () => {
   const { userProfile, updateUserProfile, activeRole, setActiveRole } = useApp();
+  const { logout, appUser } = useAuth();
 
   const [activeTab, setActiveTab] = useState<'details' | 'security' | 'activity'>('details');
 
@@ -27,6 +29,14 @@ export const UserProfilePage: React.FC = () => {
   const [phone, setPhone] = useState(userProfile.phone);
   const [designation, setDesignation] = useState(userProfile.designation);
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  const userInitials = (userProfile.fullName || 'Vatsal Goyal')
+    .split(' ')
+    .filter(Boolean)
+    .map(w => w[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
 
   // Password state
   const [oldPassword, setOldPassword] = useState('');
@@ -86,12 +96,9 @@ export const UserProfilePage: React.FC = () => {
       <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs">
         <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
-            <img
-              src={userProfile.avatarUrl}
-              alt={userProfile.fullName}
-              referrerPolicy="no-referrer"
-              className="w-24 h-24 rounded-2xl object-cover shadow-md ring-4 ring-emerald-600/20"
-            />
+            <div className="w-20 h-20 rounded-2xl bg-emerald-800 text-amber-300 flex items-center justify-center font-extrabold text-2xl shadow-md ring-4 ring-emerald-600/20">
+              {userInitials}
+            </div>
             <div className="space-y-1">
               <div className="flex items-center gap-2 justify-center sm:justify-start">
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -117,10 +124,10 @@ export const UserProfilePage: React.FC = () => {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => alert('Logged out demo session successfully.')}
-              className="px-3.5 py-2 text-xs font-semibold rounded-lg border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1.5 transition-colors"
+              onClick={() => logout()}
+              className="px-4 py-2 text-xs font-semibold rounded-lg border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1.5 transition-colors"
             >
-              <LogOut className="w-3.5 h-3.5" /> Logout
+              <LogOut className="w-3.5 h-3.5" /> Log Out (लॉग आउट)
             </button>
           </div>
         </div>

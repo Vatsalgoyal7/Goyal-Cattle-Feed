@@ -28,7 +28,7 @@ const FloatingAIButton: React.FC = () => {
 
   return (
     <NavLink
-      to="/ai-assistant"
+      to="/app/ai-assistant"
       className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-30 group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

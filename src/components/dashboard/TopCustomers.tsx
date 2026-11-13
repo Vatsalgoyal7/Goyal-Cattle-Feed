@@ -5,10 +5,10 @@ import { Building2 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 export const TopCustomers: React.FC = () => {
-  const { customers, t } = useApp();
+  const { customers = [], t } = useApp();
 
   const sortedCustomers = [...customers].sort(
-    (a, b) => b.totalPurchases - a.totalPurchases
+    (a, b) => ((b.totalPurchases ?? (b as any).totalSales) || 0) - ((a.totalPurchases ?? (a as any).totalSales) || 0)
   );
 
   return (
@@ -24,7 +24,7 @@ export const TopCustomers: React.FC = () => {
         </div>
 
         <NavLink
-          to="/customers"
+          to="/app/customers"
           className="text-xs text-emerald-700 dark:text-emerald-400 hover:underline font-semibold"
         >
           {t.viewAll}
@@ -69,11 +69,11 @@ export const TopCustomers: React.FC = () => {
                 </td>
 
                 <td className="py-3 px-3 text-right font-mono font-bold text-slate-900 dark:text-white tabular-nums">
-                  {formatIndianCurrency(c.totalPurchases)}
+                  {formatIndianCurrency(c.totalPurchases ?? (c as any).totalSales ?? 0)}
                 </td>
 
                 <td className="py-3 px-3 text-right font-mono font-bold text-amber-700 dark:text-amber-400 tabular-nums">
-                  {formatIndianCurrency(c.outstandingAmount)}
+                  {formatIndianCurrency(c.outstandingAmount ?? (c as any).currentOutstanding ?? 0)}
                 </td>
 
                 <td className="py-3 px-3 text-center">

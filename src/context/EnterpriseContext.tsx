@@ -213,7 +213,7 @@ interface EnterpriseContextType {
 const EnterpriseContext = createContext<EnterpriseContextType | undefined>(undefined);
 
 export const EnterpriseProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { addActivity } = useApp();
+  const { addActivity, userProfile } = useApp();
 
   // Load from localStorage or defaults
   const [invoices, setInvoices] = useState<SalesInvoice[]>(() => {
@@ -902,7 +902,7 @@ export const EnterpriseProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             quantityOut: diff < 0 ? Math.abs(diff) : 0,
             balance: newStock,
             unit: p.unit,
-            createdBy: 'Rajesh Goyal (Authorized)',
+            createdBy: `${userProfile?.fullName || 'Vatsal Goyal'} (Authorized)`,
             notes: reason,
           };
           setStockMovements(mPrev => [movement, ...mPrev]);
@@ -1238,7 +1238,7 @@ export const EnterpriseProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         {
           id: `msg-init-${Date.now()}`,
           role: 'assistant',
-          content: `Namaste Rajesh ji! Main Goyal AI Partner hoon, aapka cattle feed business companion. Hum "${workspace}" workspace mein hain. Aaj hum kya discuss ya manage karein?`,
+          content: `Namaste ${userProfile?.fullName?.split(' ')[0] || 'Vatsal'} ji! Main Goyal AI Partner hoon, aapka cattle feed business companion. Hum "${workspace}" workspace mein hain. Aaj hum kya discuss ya manage karein?`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           workspace,
         },
@@ -1646,7 +1646,7 @@ export const EnterpriseProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const auditItem: AIActionAuditLog = {
         id: `aud-${Date.now()}`,
         actionType: 'Stock In',
-        performedBy: 'Rajesh Goyal (via Goyal AI Partner)',
+        performedBy: `${userProfile?.fullName || 'Vatsal Goyal'} (via Goyal AI Partner)`,
         details: `Added ${payload.numberOfBags || payload.quantity} units of ${payload.productName} into ${payload.warehouseName}`,
         recordId: refNum,
         status: 'Success',
@@ -1660,7 +1660,7 @@ export const EnterpriseProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const auditItem: AIActionAuditLog = {
         id: `aud-${Date.now()}`,
         actionType: 'Remember Memory',
-        performedBy: 'Rajesh Goyal (via Goyal AI Partner)',
+        performedBy: `${userProfile?.fullName || 'Vatsal Goyal'} (via Goyal AI Partner)`,
         details: `Saved memory: ${action.payload.title}`,
         recordId: mem.id,
         status: 'Success',
@@ -1673,7 +1673,7 @@ export const EnterpriseProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const auditItem: AIActionAuditLog = {
         id: `aud-${Date.now()}`,
         actionType: 'Schedule Reminder',
-        performedBy: 'Rajesh Goyal (via Goyal AI Partner)',
+        performedBy: `${userProfile?.fullName || 'Vatsal Goyal'} (via Goyal AI Partner)`,
         details: `Created task reminder: ${action.payload.title}`,
         recordId: task.id,
         status: 'Success',

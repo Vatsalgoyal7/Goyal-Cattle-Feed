@@ -15,19 +15,41 @@ import {
 import { formatIndianCurrency } from '../../data/sampleData';
 
 export const MetricCardsGrid: React.FC = () => {
-  const { t, selectedDateRange } = useApp();
+  const { t, selectedDateRange, products, transactions, customers, pendingPayments } = useApp();
 
-  // Metrics data - dynamically adapted if date range changes
+  // Dynamically calculate metrics from live data
+  const liveSales = transactions
+    .filter(x => x.type === 'Sales' || x.type === 'Sale')
+    .reduce((sum, x) => sum + x.amount, 0);
+
+  const livePurchases = transactions
+    .filter(x => x.type === 'Purchase')
+    .reduce((sum, x) => sum + x.amount, 0);
+
+  const liveStockValue = products.reduce((sum, p) => sum + (p.currentStock * p.ratePerUnit), 0);
+
+  const liveReceivables = customers.reduce((sum, c) => sum + (c.outstandingAmount || 0), 0);
+
+  const livePayables = pendingPayments.reduce((sum, p) => sum + (p.dueAmount || 0), 0);
+
+  const liveCollections = transactions
+    .filter(x => x.type === 'Receipt')
+    .reduce((sum, x) => sum + x.amount, 0) || Math.round(liveSales * 0.7);
+
+  const liveExpenses = Math.round(livePurchases * 0.1) + 2400;
+  const liveProfit = Math.max(0, Math.round(liveSales * 0.12));
+
+  // Multiplier for date range filter
   const getMultiplier = () => {
     switch (selectedDateRange) {
       case 'yesterday':
-        return 0.92;
+        return 0.85;
       case 'week':
-        return 5.8;
+        return 3.5;
       case 'month':
-        return 24.5;
+        return 12.0;
       case 'last_month':
-        return 26.0;
+        return 14.0;
       default:
         return 1.0;
     }
@@ -38,52 +60,52 @@ export const MetricCardsGrid: React.FC = () => {
   const metrics = [
     {
       title: t.todaysSales,
-      amount: 485200 * mult,
+      amount: Math.round(liveSales * mult),
       trend: '+12.4%',
       isPositive: true,
-      subtitle: t.vsYesterday,
+      subtitle: `${transactions.filter(x => x.type === 'Sales' || x.type === 'Sale').length} active bills generated`,
       icon: Receipt,
       iconBg: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400',
     },
     {
       title: t.todaysPurchases,
-      amount: 318450 * mult,
+      amount: Math.round(livePurchases * mult),
       trend: '-4.1%',
       isPositive: true,
-      subtitle: 'raw grain & meal procurement',
+      subtitle: 'Raw grain & cake procurement',
       icon: ShoppingCart,
       iconBg: 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400',
     },
     {
       title: t.totalStockValue,
-      amount: 8460000,
+      amount: liveStockValue,
       trend: '+2.8%',
       isPositive: true,
-      subtitle: t.finishedRawStock,
+      subtitle: `${products.length} live stock items across store & godowns`,
       icon: Package,
       iconBg: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-400',
     },
     {
       title: t.totalReceivables,
-      amount: 3245800,
+      amount: liveReceivables,
       trend: '-8.5%',
       isPositive: true,
-      subtitle: 'due from 28 feed dealers',
+      subtitle: `Due from ${customers.length} registered parties`,
       icon: Users,
       iconBg: 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400',
     },
     {
       title: t.totalPayables,
-      amount: 1892300,
+      amount: livePayables,
       trend: '+1.2%',
       isPositive: false,
-      subtitle: 'due to 14 raw suppliers',
+      subtitle: `${pendingPayments.length} upcoming supplier dues`,
       icon: CreditCard,
       iconBg: 'bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400',
     },
     {
       title: t.todaysCollections,
-      amount: 375000 * mult,
+      amount: Math.round(liveCollections * mult),
       trend: '+18.2%',
       isPositive: true,
       subtitle: 'UPI, NEFT & cash realized',
@@ -92,16 +114,16 @@ export const MetricCardsGrid: React.FC = () => {
     },
     {
       title: t.todaysExpenses,
-      amount: 42600 * mult,
+      amount: Math.round(liveExpenses * mult),
       trend: '-2.4%',
       isPositive: true,
-      subtitle: 'power, diesel, factory wages',
+      subtitle: 'Shop power, freight, local wages',
       icon: PiggyBank,
       iconBg: 'bg-orange-50 text-orange-700 dark:bg-orange-950/60 dark:text-orange-400',
     },
     {
       title: t.estimatedProfit,
-      amount: 64150 * mult,
+      amount: Math.round(liveProfit * mult),
       trend: '+14.6%',
       isPositive: true,
       subtitle: t.netMargin,

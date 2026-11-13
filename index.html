@@ -18,17 +18,18 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      // Register PWA Service Worker for offline support
+      // Unregister service workers and clear caches to prevent stale bundles
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js', { scope: '/' })
-            .then(reg => console.log('[Goyal BOS] Service Worker registered. Scope:', reg.scope))
-            .catch(err => console.warn('[Goyal BOS] Service Worker registration failed:', err));
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for (let reg of registrations) {
+            reg.unregister();
+          }
         });
-        // Listen for background sync messages
-        navigator.serviceWorker.addEventListener('message', (event) => {
-          if (event.data && event.data.type === 'SYNC_READY') {
-            window.dispatchEvent(new CustomEvent('goyal-sync-ready'));
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          for (let name of names) {
+            caches.delete(name);
           }
         });
       }

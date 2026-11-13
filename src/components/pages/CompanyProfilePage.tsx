@@ -34,14 +34,14 @@ export const CompanyProfilePage: React.FC = () => {
     <div className="space-y-6 max-w-5xl mx-auto">
       {/* Top Banner Card with Plant Photography */}
       <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md">
-        <div className="h-48 sm:h-64 w-full relative">
+        <div className="h-48 sm:h-72 w-full relative">
           <img
-            src="/src/assets/images/facility_cattle_feed_plant_1794381933331.jpg"
-            alt="Goyal Cattle Feed Manufacturing Plant"
+            src="/images/goyal_shop_real.png"
+            alt="Goyal Cattle Feed Store - Gajraula Real Store Front"
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
         </div>
 
         <div className="absolute bottom-4 left-4 sm:left-6 right-4 sm:right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-white">
@@ -301,13 +301,86 @@ export const CompanyProfilePage: React.FC = () => {
               </h3>
               <div className="p-4 rounded-xl border border-dashed border-emerald-300 dark:border-emerald-800/80 bg-emerald-50/40 dark:bg-emerald-950/20 text-center space-y-2">
                 <div className="inline-block p-2 rounded-full border-2 border-emerald-700 dark:border-emerald-500 text-emerald-800 dark:text-emerald-400 font-bold text-[11px] uppercase tracking-wider">
-                  GOYAL CATTLE FEED PVT. LTD. ★ AUTHORIZED
+                  GOYAL CATTLE FEED STORE ★ GAJRAULA
                 </div>
                 <div className="font-serif italic text-lg text-slate-800 dark:text-slate-200">
-                  Rajesh Goyal
+                  {companyProfile.authorizedSignatory}
                 </div>
                 <div className="text-[11px] text-slate-500 font-medium">
                   {companyProfile.authorizedSignatory} ({companyProfile.signatoryDesignation})
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Real Photo Gallery & Google Maps Verified Location */}
+          <div className="lg:col-span-3 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-emerald-700" /> Authentic Store & Brand Photography (Gajraula)
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Real pictures captured from Goyal Cattle Feed Store, Kavi Nagar, Indra Chowk, Gajraula, UP
+                </p>
+              </div>
+              <a
+                href="https://maps.app.goo.gl/D8MwEcaxc7GNyc8r7"
+                target="_blank"
+                rel="noreferrer"
+                className="px-3.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold flex items-center gap-1.5 hover:bg-emerald-100 transition-colors shrink-0"
+              >
+                <span>⭐ 5.0 Google Maps Store Profile</span>
+                <Globe className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="md:col-span-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 relative group">
+                <img
+                  src="/images/goyal_shop_real.png"
+                  alt="Goyal Cattle Feed Store Front"
+                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/80 to-transparent text-white text-xs">
+                  <p className="font-bold">Main Store & Compound Facade</p>
+                  <p className="text-[10px] text-amber-300">Kavi Nagar, near Indra Chowk, Gajraula</p>
+                </div>
+              </div>
+
+              <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 relative group bg-amber-50">
+                <img
+                  src="/images/banner_sp_pashu_aahar.png"
+                  alt="SP Pashu Aahar Signboard"
+                  className="w-full h-48 object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-black/80 to-transparent text-white text-xs">
+                  <p className="font-bold">SP Pashu Aahar</p>
+                  <p className="text-[10px] text-amber-300">गाय - भैंस का सर्वोत्तम आहार</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 relative group bg-emerald-50">
+                  <img
+                    src="/images/banner_gavaksha.png"
+                    alt="Gavaksha Pashu Aahar"
+                    className="w-full h-22 object-contain p-1.5 group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 p-1.5 bg-gradient-to-t from-black/80 to-transparent text-white text-[10px]">
+                    <p className="font-bold">Gavaksha Feed</p>
+                  </div>
+                </div>
+
+                <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 relative group bg-blue-50">
+                  <img
+                    src="/images/banner_satkar.png"
+                    alt="Satkar Pashu Aahar"
+                    className="w-full h-22 object-contain p-1.5 group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 p-1.5 bg-gradient-to-t from-black/80 to-transparent text-white text-[10px]">
+                    <p className="font-bold">Satkar Feed</p>
+                  </div>
                 </div>
               </div>
             </div>

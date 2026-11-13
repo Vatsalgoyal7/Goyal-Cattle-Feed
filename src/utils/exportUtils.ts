@@ -240,16 +240,16 @@ export function generateInvoicePdf(invoice: SalesInvoice): void {
   doc.text('Bank & Settlement Information:', 40, y);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
-  doc.text('Bank: HDFC Bank Ltd., GT Road Branch, Khanna', 40, y + 14);
-  doc.text('Account Number: 50200084920193 | IFSC: HDFC0000492', 40, y + 26);
-  doc.text('UPI ID: goyalfeed@hdfcbank', 40, y + 38);
+  doc.text('Bank: State Bank of India, Basti Gajraula Branch', 40, y + 14);
+  doc.text('Account Number: 30495839201 | IFSC: SBIN0001234', 40, y + 26);
+  doc.text('UPI ID: 9837049021@upi', 40, y + 38);
 
   // Authorized Signatory
-  doc.text('For Goyal Cattle Feed Pvt. Ltd.', 440, y + 14);
+  doc.text('For Goyal Cattle Feed Store', 440, y + 14);
   doc.setFont('helvetica', 'italic');
-  doc.text('Rajesh Goyal', 440, y + 38);
+  doc.text('Vatsal Goyal', 440, y + 38);
   doc.setFont('helvetica', 'normal');
-  doc.text('Authorized Signatory', 440, y + 50);
+  doc.text('Proprietor / Authorized Signatory', 440, y + 50);
 
   doc.save(`${invoice.invoiceNumber.replace(/\//g, '_')}.pdf`);
 }
