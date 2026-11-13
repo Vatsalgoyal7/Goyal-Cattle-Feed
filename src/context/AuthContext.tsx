@@ -65,6 +65,18 @@ export interface CompanyProfile {
   financialYear: string;
   branches: { id: string; name: string; address: string; phone: string }[];
   bankDetails: { bankName: string; accountNo: string; ifsc: string; branch: string };
+  // Chakravyuh 2K26 feature additions
+  aboutDescription?: string;
+  vision?: string;
+  mission?: string;
+  establishedYear?: number;
+  location?: string;
+  enableUpiQr?: boolean;
+  payeeName?: string;
+  upiId?: string;
+  requirePaymentScreenshot?: boolean;
+  customQrUrl?: string;
+  rolePermissions?: Record<string, string[]>;
 }
 
 export interface AuthContextType {
@@ -111,7 +123,7 @@ export const DEFAULT_COMPANY: CompanyProfile = {
   state: 'Uttar Pradesh',
   pincode: '244235',
   website: 'https://goyalbusiness.in',
-  logoURL: '',
+  logoURL: '/images/goyal_shop_real.png',
   primaryColor: '#065f46',
   currency: 'INR',
   financialYear: '2024-25',
@@ -119,6 +131,23 @@ export const DEFAULT_COMPANY: CompanyProfile = {
     { id: 'main', name: 'Main Shop & Attached Godown', address: 'Kavi Nagar, Gajraula', phone: '+91 98370 49021' },
   ],
   bankDetails: { bankName: 'State Bank of India', accountNo: '30495839201', ifsc: 'SBIN0001234', branch: 'Gajraula' },
+  aboutDescription: 'Goyal Cattle Feed Store (गोयल कैटल फीड स्टोर, गजरौला) 2002 से क्षेत्र के डेयरी किसानों एवं पशुपालकों को शुद्ध सरसों खल, बिनौला खल, चना-मूंग चूरी एवं संतुलित पशु आहार उपलब्ध करा रहा है।',
+  establishedYear: 2002,
+  location: 'Kavi Nagar, near Indra Chowk, opposite Shuklapuri, Gajraula, UP - 244235',
+  vision: 'गजरौला और आसपास के सभी पशुपालकों एवं किसान भाइयों को शुद्ध, मिलावट-मुक्त और उच्चतम प्रोटीन युक्त संतुलित पशु आहार प्रदान करना।',
+  mission: '1. 100% शुद्ध कच्ची घानी सरसों खल व बिनौला की आपूर्ति।\n2. पशुओं के दूध उत्पादन व स्वास्थ्य में निरंतर वृद्धि।\n3. किसानों को उचित थोक व फुटकर दाम पर उत्तम पशु आहार उपलब्ध कराना।',
+  enableUpiQr: true,
+  payeeName: 'Goyal Cattle Feed Store',
+  upiId: '9837049021@upi',
+  requirePaymentScreenshot: false,
+  customQrUrl: '',
+  rolePermissions: {
+    manager: ['khata', 'sales', 'purchases', 'stock', 'cashbook', 'reports'],
+    accountant: ['khata', 'sales', 'cashbook', 'reports'],
+    sales_executive: ['khata', 'sales'],
+    stock_manager: ['stock', 'purchases'],
+    hr_manager: ['transport', 'stock'],
+  },
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

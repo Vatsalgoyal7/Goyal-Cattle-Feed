@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from '../common/BrandLogo';
 import { LanguageToggle } from '../common/LanguageToggle';
 import { SITE_CONTENT, SiteLanguage } from '../../i18n/siteCopy';
@@ -25,6 +26,7 @@ const TEAM = [
 ];
 
 export const AboutPage: React.FC = () => {
+  const { companyProfile } = useAuth();
   const [lang, setLang] = useState<SiteLanguage>(() => {
     return (localStorage.getItem('goyal_lang') as SiteLanguage) || 'hi';
   });
@@ -76,14 +78,14 @@ export const AboutPage: React.FC = () => {
       >
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
           <div className="inline-block bg-amber-400/20 border border-amber-300/40 text-amber-200 text-xs font-bold px-4 py-1.5 rounded-full mb-6">
-            {copy.tag}
+            ESTD {companyProfile?.establishedYear || 2002} · {companyProfile?.location || 'Gajraula, Uttar Pradesh'}
           </div>
           <h1 className="text-4xl sm:text-5xl font-black mb-5 tracking-tight">
-            {copy.heading} <br />
+            {companyProfile?.name || copy.heading} <br />
             <span className="text-amber-300">{copy.headingHighlight}</span>
           </h1>
           <p className="text-emerald-100 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
-            {copy.desc}
+            {companyProfile?.vision || copy.desc}
           </p>
         </div>
       </section>
@@ -100,7 +102,7 @@ export const AboutPage: React.FC = () => {
                 {copy.storyHeading}
               </h2>
               <div className="space-y-4 text-slate-600 leading-relaxed font-normal text-sm sm:text-base">
-                <p>{copy.storyP1}</p>
+                <p>{companyProfile?.aboutDescription || copy.storyP1}</p>
                 <p>{copy.storyP2}</p>
                 <p>{copy.storyP3}</p>
               </div>
