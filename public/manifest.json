@@ -1,0 +1,25 @@
+{
+  "short_name": "Goyal Feed",
+  "name": "Goyal Cattle Feed Store - Business OS",
+  "description": "Complete Business Management, Khata & Operations OS for Goyal Cattle Feed Store, Gajraula",
+  "icons": [
+    {
+      "src": "/images/goyal_shop_real.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/goyal_shop_real.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/app",
+  "background_color": "#022c22",
+  "theme_color": "#064e3b",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/"
+}

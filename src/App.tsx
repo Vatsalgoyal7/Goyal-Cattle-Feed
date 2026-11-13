@@ -5,6 +5,7 @@ import { EnterpriseProvider } from './context/EnterpriseContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppLayout } from './components/layout/AppLayout';
 import { AuthPage } from './components/auth/AuthPage';
+import { ApprovalWaitingScreen } from './components/auth/ApprovalWaitingScreen';
 import { CustomizationPanel } from './components/layout/CustomizationPanel';
 import { HomePage } from './components/pages/HomePage';
 import { AboutPage } from './components/pages/AboutPage';
@@ -62,7 +63,7 @@ const LoadingScreen = () => (
 
 // ── Auth-gated inner app layout ──────────────────────────────
 const AppRoutes: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, appUser } = useAuth();
   const [forceReady, setForceReady] = React.useState(false);
 
   // Safety timer: Never block user more than 800ms
@@ -75,6 +76,12 @@ const AppRoutes: React.FC = () => {
 
   if (!isAuthenticated) {
     return <AuthPage />;
+  }
+
+  // Chakravyuh Security: Unapproved staff must wait for SuperAdmin approval
+  const isSuperAdmin = (appUser?.email || '').toLowerCase() === 'vatsalgoyal71@gmail.com' || appUser?.role === 'super_admin' || appUser?.role === 'owner';
+  if (appUser && appUser.approvalStatus === 'pending' && !isSuperAdmin) {
+    return <ApprovalWaitingScreen />;
   }
 
   return (

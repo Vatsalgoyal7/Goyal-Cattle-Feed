@@ -175,7 +175,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
               {showHindi ? 'गोयल पशु आहार · गजरौला' : 'Business Management OS'}
             </span>
             <span className="hidden sm:inline-block text-[9px] font-mono px-1 rounded bg-amber-400/20 text-amber-600 dark:text-amber-300 font-bold">
-              ESTD 2015
+              ESTD 2002
             </span>
           </div>
         </div>

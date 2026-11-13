@@ -9,7 +9,7 @@ import {
   Camera, Upload
 } from 'lucide-react';
 
-type AdminTab = 'company' | 'users' | 'settings';
+type AdminTab = 'company' | 'users' | 'approvals' | 'settings';
 
 const ROLE_LABELS: Record<UserRole, string> = {
   super_admin:     'Super Admin',
@@ -32,8 +32,8 @@ const ROLE_COLORS: Record<UserRole, string> = {
 };
 
 export const SuperAdminPanel: React.FC = () => {
-  const { appUser, companyProfile, updateCompanyProfile, allUsers, updateUserRole, deactivateUser, reactivateUser, deleteUser, logout } = useAuth();
-  const [activeTab, setActiveTab]   = useState<AdminTab>('company');
+  const { appUser, companyProfile, updateCompanyProfile, allUsers, pendingUsers, updateUserRole, approveUser, rejectUser, deactivateUser, reactivateUser, deleteUser, logout } = useAuth();
+  const [activeTab, setActiveTab]   = useState<AdminTab>(pendingUsers.length > 0 ? 'approvals' : 'company');
   const [editCompany, setEditCompany] = useState(false);
   const [companyForm, setCompanyForm] = useState<CompanyProfile>(companyProfile || DEFAULT_COMPANY);
   const [saving, setSaving]         = useState(false);
@@ -74,6 +74,7 @@ export const SuperAdminPanel: React.FC = () => {
   );
 
   const TABS: { id: AdminTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { id: 'approvals', label: `Staff Approvals (${pendingUsers.length})`, icon: UserCheck },
     { id: 'company',  label: 'Company Profile', icon: Building2 },
     { id: 'users',    label: 'User Management', icon: Users },
     { id: 'settings', label: 'App Settings',    icon: Settings },
@@ -111,6 +112,99 @@ export const SuperAdminPanel: React.FC = () => {
       </div>
 
       <div className="max-w-5xl mx-auto p-6">
+
+        {/* ── STAFF APPROVALS TAB (CHAKRAVYUH SECURITY) ── */}
+        {activeTab === 'approvals' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>Staff Registration Approvals</span>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 font-bold">
+                    {pendingUsers.length} Pending
+                  </span>
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Chakravyuh Access Gate: Review and grant access to new Munim, Labour, and Sales staff
+                </p>
+              </div>
+            </div>
+
+            {pendingUsers.length === 0 ? (
+              <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center space-y-3">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mx-auto">
+                  <CheckCircle className="w-7 h-7" />
+                </div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Sabhi Staff Request Approved Hain!
+                </h3>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  Koi naya registration pending nahi hai. Jab bhi koi naya staff sign up karega, unka request yahan aayega.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {pendingUsers.map((u) => (
+                  <div
+                    key={u.uid}
+                    className="bg-white dark:bg-slate-900 rounded-2xl border-2 border-amber-300/80 dark:border-amber-700/60 p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 text-white font-extrabold text-base flex items-center justify-center shadow-md shrink-0">
+                        {u.displayName ? u.displayName.substring(0, 2).toUpperCase() : 'ST'}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-slate-900 dark:text-white text-base">
+                            {u.displayName}
+                          </h4>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 uppercase">
+                            Requested: {ROLE_LABELS[u.role] || u.role}
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-500 flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                          {u.phone && <span>📞 {u.phone}</span>}
+                          <span>✉️ {u.email}</span>
+                          <span>🕒 {new Date(u.createdAt).toLocaleDateString('en-IN')}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5 shrink-0">
+                      <select
+                        defaultValue={u.role}
+                        onChange={(e) => updateUserRole(u.uid, e.target.value as UserRole)}
+                        className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 outline-none"
+                      >
+                        <option value="manager">Manager / Muneem</option>
+                        <option value="accountant">Accountant</option>
+                        <option value="sales_executive">Salesman (Counter Billing)</option>
+                        <option value="stock_manager">Stock Manager / Godown Labour</option>
+                        <option value="hr_manager">Transport / Driver</option>
+                      </select>
+
+                      <button
+                        onClick={() => approveUser(u.uid)}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-bold shadow-md transition-all cursor-pointer"
+                      >
+                        <UserCheck className="w-4 h-4" />
+                        <span>Approve Karein</span>
+                      </button>
+
+                      <button
+                        onClick={() => rejectUser(u.uid)}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-rose-200 dark:border-rose-900/40 text-rose-700 dark:text-rose-400 hover:bg-rose-50 text-xs font-bold transition-all cursor-pointer"
+                      >
+                        <UserX className="w-4 h-4" />
+                        <span>Reject</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ── COMPANY PROFILE TAB ── */}
         {activeTab === 'company' && (

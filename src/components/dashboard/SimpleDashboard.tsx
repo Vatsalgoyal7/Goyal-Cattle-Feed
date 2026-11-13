@@ -13,9 +13,21 @@ import {
 import { formatIndianCurrency } from '../../data/sampleData';
 
 export const SimpleDashboard: React.FC = () => {
-  const { setActiveQuickAction, t, products } = useApp();
+  const { setActiveQuickAction, t, products, transactions, customers } = useApp();
 
-  const lowStockCount = products.filter(p => p.currentStock < p.minStockLevel).length;
+  const liveSales = transactions
+    .filter(x => x.type === 'Sales' || x.type === 'Sale')
+    .reduce((sum, x) => sum + x.amount, 0);
+
+  const liveCollections = transactions
+    .filter(x => x.type === 'Receipt')
+    .reduce((sum, x) => sum + x.amount, 0);
+
+  const liveUdhar = customers.reduce((sum, c) => sum + (c.outstandingAmount || 0), 0);
+  const liveStockValue = products.reduce((sum, p) => sum + (p.currentStock * p.ratePerUnit), 0);
+  const totalBagsInStock = products.reduce((sum, p) => sum + p.currentStock, 0);
+
+  const lowStockCount = products.filter(p => p.currentStock > 0 && p.currentStock < p.minStockLevel).length;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto py-2">
@@ -43,10 +55,10 @@ export const SimpleDashboard: React.FC = () => {
               {t.todaysSales} (आज की बिक्री)
             </div>
             <div className="text-3xl font-extrabold font-mono text-emerald-800 dark:text-emerald-300 tabular-nums">
-              {formatIndianCurrency(485200)}
+              {formatIndianCurrency(liveSales)}
             </div>
             <div className="text-xs font-semibold text-emerald-600 mt-1 flex items-center gap-1">
-              <TrendingUp className="w-4 h-4" /> 277 बोरी माल बिका
+              <TrendingUp className="w-4 h-4" /> Live bill counter
             </div>
           </div>
         </div>
@@ -61,7 +73,7 @@ export const SimpleDashboard: React.FC = () => {
               {t.todaysCollections} (आज की वसूली)
             </div>
             <div className="text-3xl font-extrabold font-mono text-teal-800 dark:text-teal-300 tabular-nums">
-              {formatIndianCurrency(375000)}
+              {formatIndianCurrency(liveCollections)}
             </div>
             <div className="text-xs font-semibold text-teal-600 mt-1">
               बैंक + यूपीआई + नकद
@@ -79,10 +91,10 @@ export const SimpleDashboard: React.FC = () => {
               {t.totalReceivables} (मार्केट उधारी)
             </div>
             <div className="text-3xl font-extrabold font-mono text-amber-800 dark:text-amber-300 tabular-nums">
-              {formatIndianCurrency(3245800)}
+              {formatIndianCurrency(liveUdhar)}
             </div>
             <div className="text-xs font-semibold text-amber-600 mt-1">
-              28 डीलरों से बकाया
+              {customers.filter(c => (c.outstandingAmount || 0) > 0).length} ग्राहकों से बकाया
             </div>
           </div>
         </div>
@@ -97,10 +109,10 @@ export const SimpleDashboard: React.FC = () => {
               {t.totalStockValue} (गोदाम में माल)
             </div>
             <div className="text-3xl font-extrabold font-mono text-indigo-800 dark:text-indigo-300 tabular-nums">
-              {formatIndianCurrency(8460000)}
+              {formatIndianCurrency(liveStockValue)}
             </div>
             <div className="text-xs font-semibold text-indigo-600 mt-1">
-              1,420 टन तैयार व कच्चा माल
+              {totalBagsInStock} बोरी तैयार व कच्चा माल
             </div>
           </div>
         </div>

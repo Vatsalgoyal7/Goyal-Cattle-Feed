@@ -30,6 +30,8 @@ export type UserRole =
   | 'sales_executive'
   | 'hr_manager';
 
+export type ApprovalStatus = 'approved' | 'pending' | 'rejected';
+
 export interface AppUser {
   uid: string;
   email: string;
@@ -38,6 +40,8 @@ export interface AppUser {
   phone?: string;
   photoURL?: string;
   isActive: boolean;
+  approvalStatus: ApprovalStatus;
+  rejectionReason?: string;
   createdAt: string;
   lastLogin: string;
   branchAccess: string[];
@@ -86,7 +90,10 @@ export interface AuthContextType {
 
   // User management (super admin)
   allUsers: AppUser[];
+  pendingUsers: AppUser[];
   updateUserRole: (uid: string, role: UserRole) => Promise<void>;
+  approveUser: (uid: string, assignedRole?: UserRole) => Promise<void>;
+  rejectUser: (uid: string, reason?: string) => Promise<void>;
   deactivateUser: (uid: string) => Promise<void>;
   reactivateUser: (uid: string) => Promise<void>;
   deleteUser: (uid: string) => Promise<void>;
@@ -137,13 +144,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateDoc(userRef, { lastLogin: new Date().toISOString() }).catch(() => {});
         return data;
       } else {
+        const isOwner = (fbUser.email || '').toLowerCase() === 'vatsalgoyal71@gmail.com';
         const newUser: AppUser = {
           uid: fbUser.uid,
           email: fbUser.email || '',
           displayName: fbUser.displayName || 'Vatsal Goyal',
-          role: 'owner',
+          role: isOwner ? 'owner' : 'manager',
           photoURL: fbUser.photoURL || undefined,
-          isActive: true,
+          isActive: isOwner,
+          approvalStatus: isOwner ? 'approved' : 'pending',
           createdAt: new Date().toISOString(),
           lastLogin: new Date().toISOString(),
           branchAccess: ['all'],
@@ -156,13 +165,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (err) {
       console.warn('Firestore fallback user profile used:', err);
+      const isOwner = (fbUser.email || '').toLowerCase() === 'vatsalgoyal71@gmail.com';
       const fallbackUser: AppUser = {
         uid: fbUser.uid,
         email: fbUser.email || '',
         displayName: fbUser.displayName || 'Vatsal Goyal',
-        role: 'owner',
+        role: isOwner ? 'owner' : 'manager',
         photoURL: fbUser.photoURL || undefined,
-        isActive: true,
+        isActive: isOwner,
+        approvalStatus: isOwner ? 'approved' : 'pending',
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString(),
         branchAccess: ['all'],
@@ -200,13 +211,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setFirebaseUser(fbUser);
       if (fbUser) {
         // Fast local fallback immediately so user never waits
+        const isOwner = (fbUser.email || '').toLowerCase() === 'vatsalgoyal71@gmail.com';
         const cachedUser: AppUser = {
           uid: fbUser.uid,
           email: fbUser.email || 'vatsalgoyal71@gmail.com',
           displayName: fbUser.displayName || 'Vatsal Goyal',
-          role: 'owner',
+          role: isOwner ? 'owner' : 'manager',
           photoURL: fbUser.photoURL || undefined,
-          isActive: true,
+          isActive: isOwner,
+          approvalStatus: isOwner ? 'approved' : 'pending',
           createdAt: new Date().toISOString(),
           lastLogin: new Date().toISOString(),
           branchAccess: ['all'],
@@ -290,13 +303,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { user } = await firebaseSignUp(email, password);
       await firebaseUpdateProfile(user, { displayName: name }).catch(() => {});
 
+      const isSuperAdminEmail = email.toLowerCase() === 'vatsalgoyal71@gmail.com';
+      const isOwnerRole = role === 'owner' || role === 'super_admin';
+      const isAutoApproved = isSuperAdminEmail || isOwnerRole;
+
       const newAppUser: AppUser = {
         uid: user.uid,
         email,
         displayName: name,
-        role,
+        role: isSuperAdminEmail ? 'owner' : role,
         phone: phone || '',
-        isActive: true,
+        isActive: isAutoApproved,
+        approvalStatus: isAutoApproved ? 'approved' : 'pending',
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString(),
         branchAccess: ['all'],
@@ -318,14 +336,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthError(null);
     try {
       const { user } = await firebaseSignInWithGoogle();
+      const isSuperAdminEmail = user.email?.toLowerCase() === 'vatsalgoyal71@gmail.com';
+      const isOwnerRole = role === 'owner' || role === 'super_admin';
+      const isAutoApproved = isSuperAdminEmail || isOwnerRole;
+
       const newAppUser: AppUser = {
         uid: user.uid,
         email: user.email || '',
         displayName: extra?.displayName || user.displayName || 'Goyal Associate',
-        role,
+        role: isSuperAdminEmail ? 'owner' : role,
         phone: phone || '',
         photoURL: user.photoURL || undefined,
-        isActive: true,
+        isActive: isAutoApproved,
+        approvalStatus: isAutoApproved ? 'approved' : 'pending',
         createdAt: new Date().toISOString(),
         lastLogin: new Date().toISOString(),
         branchAccess: ['all'],
@@ -375,24 +398,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // ── User Management (Super Admin) ─────────────────────────
+  // ── User Management & Approvals (Super Admin) ──────────────
   const updateUserRole = async (uid: string, role: UserRole) => {
     await updateDoc(doc(db, COLLECTIONS.USERS, uid), { role });
+    setAllUsers(prev => prev.map(u => u.uid === uid ? { ...u, role } : u));
+  };
+
+  const approveUser = async (uid: string, assignedRole?: UserRole) => {
+    const updateData: any = { approvalStatus: 'approved', isActive: true };
+    if (assignedRole) updateData.role = assignedRole;
+    await updateDoc(doc(db, COLLECTIONS.USERS, uid), updateData).catch(() => {});
+    setAllUsers(prev => prev.map(u => u.uid === uid ? { ...u, ...updateData } : u));
+  };
+
+  const rejectUser = async (uid: string, reason = 'Application declined by SuperAdmin') => {
+    const updateData = { approvalStatus: 'rejected', isActive: false, rejectionReason: reason };
+    await updateDoc(doc(db, COLLECTIONS.USERS, uid), updateData).catch(() => {});
+    setAllUsers(prev => prev.map(u => u.uid === uid ? { ...u, ...updateData } : u));
   };
 
   const deactivateUser = async (uid: string) => {
-    await updateDoc(doc(db, COLLECTIONS.USERS, uid), { isActive: false });
+    await updateDoc(doc(db, COLLECTIONS.USERS, uid), { isActive: false }).catch(() => {});
+    setAllUsers(prev => prev.map(u => u.uid === uid ? { ...u, isActive: false } : u));
   };
 
   const reactivateUser = async (uid: string) => {
-    await updateDoc(doc(db, COLLECTIONS.USERS, uid), { isActive: true });
+    await updateDoc(doc(db, COLLECTIONS.USERS, uid), { isActive: true }).catch(() => {});
+    setAllUsers(prev => prev.map(u => u.uid === uid ? { ...u, isActive: true } : u));
   };
 
   const deleteUser = async (uid: string) => {
-    await deleteDoc(doc(db, COLLECTIONS.USERS, uid));
+    await deleteDoc(doc(db, COLLECTIONS.USERS, uid)).catch(() => {});
+    setAllUsers(prev => prev.filter(u => u.uid !== uid));
   };
 
   const clearError = () => setAuthError(null);
+
+  const pendingUsers = allUsers.filter(u => u.approvalStatus === 'pending');
 
   return (
     <AuthContext.Provider value={{
@@ -411,7 +453,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       companyProfile,
       updateCompanyProfile,
       allUsers,
+      pendingUsers,
       updateUserRole,
+      approveUser,
+      rejectUser,
       deactivateUser,
       reactivateUser,
       deleteUser,

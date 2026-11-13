@@ -13,6 +13,7 @@ import { PendingPaymentsTable } from '../dashboard/PendingPaymentsTable';
 import { RecentActivityFeed } from '../dashboard/RecentActivityFeed';
 import { LowStockAlerts } from '../dashboard/LowStockAlerts';
 import { SimpleDashboard } from '../dashboard/SimpleDashboard';
+import { KhataDashboard } from '../khata/KhataDashboard';
 import { BRANCHES } from '../../data/sampleData';
 import { DateRange, BranchLocation } from '../../types';
 import {
@@ -21,6 +22,8 @@ import {
   Sparkles,
   Download,
   Filter,
+  BookOpen,
+  LayoutDashboard,
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
@@ -35,6 +38,7 @@ export const DashboardPage: React.FC = () => {
     displayMode,
   } = useApp();
 
+  const [dashboardView, setDashboardView] = useState<'khata' | 'enterprise'>('khata');
   const [isExporting, setIsExporting] = useState(false);
 
   // Dynamic greeting based on current local time
@@ -160,14 +164,39 @@ export const DashboardPage: React.FC = () => {
           ))}
         </div>
 
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-          <Filter className="w-3.5 h-3.5" />
-          <span>Real-time feeds updating every 60s</span>
+        <div className="flex items-center gap-2">
+          {/* Main View Switcher: Khatabook vs Enterprise */}
+          <div className="flex items-center bg-slate-200/80 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
+            <button
+              onClick={() => setDashboardView('khata')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+                dashboardView === 'khata'
+                  ? 'bg-emerald-800 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5 text-amber-300" />
+              <span>खाता बुक (Khatabook)</span>
+            </button>
+            <button
+              onClick={() => setDashboardView('enterprise')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+                dashboardView === 'enterprise'
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
+              }`}
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              <span>व्यापार व गोदाम (ERP)</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* RENDER SIMPLE OR ADVANCED MODE */}
-      {displayMode === 'simple' ? (
+      {/* RENDER KHATABOOK OR ENTERPRISE VIEW */}
+      {dashboardView === 'khata' ? (
+        <KhataDashboard />
+      ) : displayMode === 'simple' ? (
         <SimpleDashboard />
       ) : (
         <div className="space-y-6">
